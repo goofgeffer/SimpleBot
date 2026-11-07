@@ -1,0 +1,20 @@
+# Build outputs
+simplebot
+simplebot.exe
+*.o
+*.obj
+*.exe
+*.out
+
+# Temporary icon build files
+simplebot.rc
+simplebot_res.o
+
+# clangd
+.cache/
+compile_commands.json
+
+# Editor / OS
+.vscode/
+.DS_Store
+Thumbs.db
