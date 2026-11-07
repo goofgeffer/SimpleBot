@@ -16,30 +16,32 @@ typedef struct {
 
 // List of topics, mostly sourced from Wikipedia
 const char *topics[] = {
-    "Arithmetic is a branch of mathematics that deals with operations like addition, subtraction, multiplication, and division. "
-    "Arithmetic is very important in day to day life. "
+    "Arithmetic is a branch of mathematics that deals with operations like addition, subtraction, multiplication, and division.\n"
+    "Arithmetic is very important in day to day life.\n"
     "Here are 2 examples: 9 + 9 = 18, 5 * 5 = 25\n",
     
-    "Shapes are a representation of an object's external boundary or outline. "
-    "Simple shapes typically make up our life, such as a square TV or a rectangle. "
-    "A few examples of shapes would be a square (4 corners, 4 equal length sides), a triangle (3 corners, 3 sides), and a rectangle (4 corners, 2 pairs of equal length sides but the pairs "
+    "Shapes are a representation of an object's external boundary or outline.\n"
+    "Simple shapes typically make up our life, such as a square TV or a rectangle.\n"
+    "A few examples of shapes would be a square (4 corners, 4 equal length sides), a triangle (3 corners, 3 sides),"
+    "and a rectangle (4 corners, 2 pairs of equal length sides but the pairs"
     "are different lengths)\n",
 
-    "PEMDAS is the order of operations used to solve math problems with more than one operation. "
-    "It stands for Parentheses, Exponents, Multiplication, Division, Addition, and Subtraction. "
-    "Multiplication and division share the same level and are done left to right, and so do addition and subtraction. "
+    "PEMDAS is the order of operations used to solve math problems with more than one operation.\n"
+    "It stands for Parentheses, Exponents, Multiplication, Division, Addition, and Subtraction.\n"
+    "Multiplication and division share the same level and are done left to right, and so do addition and subtraction.\n"
     "Here are 2 examples: 2 + 3 * 4 = 14 (multiply first), (2 + 3) * 4 = 20 (parentheses first)\n",
 
-    "The periodic table is a chart that organizes all known elements by their atomic number, which is how many protons are in that atom. "
-    "Elements in the same column have similar properties, and each element has a one or two letter symbol. "
+    "The periodic table is a chart that organizes all known elements by their atomic number, which is how many protons are in that atom.\n"
+    "Elements in the same column have similar properties, and each element has a one or two letter symbol.\n"
     "Some examples of elements on the table would be hydrogen (H, atomic number 1), carbon (C, atomic number 6), and oxygen (O, atomic number 8)\n",
 
-    "The scientific method is a step by step process scientists use to investigate questions and test ideas. "
-    "The basic steps are: ask a question, do research, form a hypothesis, test it with an experiment, analyze the results, and share the conclusion. "
-    "For example, you could question if a sunflower grows faster with more light, do research about it, form a hypothesis, test it with different levels of light, and share the conclusion\n",
+    "The scientific method is a step by step process scientists use to investigate questions and test ideas.\n"
+    "The basic steps are: ask a question, do research, form a hypothesis, test it with an experiment, analyze the results, and share the conclusion.\n"
+    "For example, you could question if a sunflower grows faster with more light, do research about it, form a hypothesis, test it with different levels of light,"
+    "and share the conclusion\n",
     
-    "Atoms are building blocks that all matter is made of. "
-    "An atom has a nucleus in the center made of protons (positive charge) and neutrons (no charge), with electrons (negative charge) moving around the outside. "
+    "Atoms are building blocks that all matter is made of.\n"
+    "An atom has a nucleus in the center made of protons (positive charge) and neutrons (no charge), with electrons (negative charge) moving around the outside.\n"
     "3 examples of atoms would be a hydrogen atom (1 proton, 1 electron), a helium atom (2 protons, 2 neutrons, 2 electrons), and a carbon atom (6 protons, 6 neutrons, 6 electrons)\n"
 };
 
@@ -100,4 +102,61 @@ const KeyValuePair chat_pairs[] = {
     {"happy", "good"},
     {"sad", "bad"}
 };
+
+const char *vocab_list = 
+    "hello\n"
+    "hi\n"
+    "hey\n"
+    "greetings\n"
+    "how\n"
+    "so\n"
+    "are\n"
+    "do\n"
+    "is\n"
+    "what\n"
+    "who\n"
+    "where\n"
+    "why\n"
+    "when\n"
+    "wood\n"
+    "water\n"
+    "fire\n"
+    "feel\n"
+    "good\n"
+    "bad\n"
+    "yes\n"
+    "no\n"
+    "maybe\n"
+    "sure\n"
+    "thanks\n"
+    "thank you\n"
+    "bye\n"
+    "goodbye\n"
+    "2+2\n"
+    "3*3\n"
+    "5-2\n"
+    "10/2\n"
+    "1+1\n"
+    "4*4\n"
+    "6-3\n"
+    "8/4\n"
+    "7+5\n"
+    "9*2\n"
+    "12-7\n"
+    "15/3\n"
+    "arithmetic\n"
+    "shapes\n"
+    "pemdas\n"
+    "periodic table\n"
+    "scientific method\n"
+    "atoms\n"
+    "math\n"
+    "science\n"
+    "computer\n"
+    "programming\n"
+    "you\n"
+    "life\n"
+    "happy\n"
+    "sad\n";
+
 #endif
