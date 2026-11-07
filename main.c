@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define VERSION "v0.1"
+#define CLEAR_SCREEN() printf("\033[2J\033[H") // ANSI escape code to clear the screen
 
 int print_learn_help(){
 	// Prints the options for the user to choose from
@@ -75,6 +76,7 @@ int main(void) {
 		    printf("h/help, Help about the commands\n");
 		    printf("v/version, Current version\n");
 		    printf("l/learn, Enters the learning engine interface, lets you choose from a list of subjects and you get a rough overview of each\n");
+			printf("c/clear, Clears the screen\n");
 		} else if (strcmp(command, "v") == 0 || strcmp(command, "version") == 0) {
 		    printf("SimpleBot %s\n", VERSION);
 		} else if (strcmp(command, "l") == 0 || strcmp(command, "learn") == 0){
@@ -158,6 +160,8 @@ int main(void) {
 					continue;
 				}
 			}
+		} else if (strcmp(command, "c") == 0 || strcmp(command, "clear") == 0) {
+			CLEAR_SCREEN();
 		} else {
 			printf("Unknown command. Type h for help.\n");
 		}
