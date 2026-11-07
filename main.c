@@ -2,6 +2,8 @@
 #include <ctype.h>
 #include <string.h>
 
+#define VERSION "v0.1"
+
 int print_learn_help(){
 	// Prints the options for the user to choose from
 	printf("Options:\n");
@@ -67,14 +69,14 @@ int main(void) {
 		
 		if (strcmp(command, "h") == 0 || strcmp(command, "help") == 0) {
 			// Just prints the name of app, version, and a list of commands.
-		    printf("SimpleBot v0.1\n");
+		    printf("SimpleBot %s\n", VERSION);
 			printf("Commands:\n");
 		    printf("q/quit OR exit OR end, Ends the chat interface\n");
 		    printf("h/help, Help about the commands\n");
 		    printf("v/version, Current version\n");
 		    printf("l/learn, Enters the learning engine interface, lets you choose from a list of subjects and you get a rough overview of each\n");
 		} else if (strcmp(command, "v") == 0 || strcmp(command, "version") == 0) {
-		    printf("SimpleBot v0.1\n");
+		    printf("SimpleBot %s\n", VERSION);
 		} else if (strcmp(command, "l") == 0 || strcmp(command, "learn") == 0){
 			printf("SIMPLEBOT LEARNING ENGINE\n");
 			printf("Quick overviews of topics, with examples\n");
