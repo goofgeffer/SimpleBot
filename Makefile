@@ -1,27 +1,29 @@
 # Cross-platform Makefile for simplebot (Windows, Linux, macOS)
-# Usage: make   (or mingw32-make on Windows)
+# Usage: make        (or mingw32-make on Windows)
+#        make run    (compiles and runs SimpleBot)
 #        make clean
 
 CC     = gcc
 CFLAGS = -Wall -Wextra -O2
 SRC    = main.c
 
+# Force Windows cmd.exe if we are on Windows
+ifeq ($(OS),Windows_NT)
+    SHELL = cmd.exe
+.SHELLFLAGS = /c
+endif
+
 # ---------- Platform detection ----------
 ifeq ($(OS),Windows_NT)
-  TARGET = simplebot.exe
-  ifneq (,$(findstring cmd,$(notdir $(SHELL))))
-    # Plain Windows cmd.exe (e.g. mingw32-make without MSYS)
-    NULL  = NUL
-    RM_F  = -del /q
-  else
-    # MSYS2 / Git Bash / Cygwin on Windows
-    NULL  = /dev/null
-    RM_F  = -rm -f
-  endif
+  TARGET  = simplebot.exe
+  NULL    = NUL
+  RM_F    = -del /q
+  RUN_CMD = $(TARGET)
 else
-  TARGET = simplebot
-  NULL   = /dev/null
-  RM_F   = -rm -f
+  TARGET  = simplebot
+  NULL    = /dev/null
+  RM_F    = -rm -f
+  RUN_CMD = ./$(TARGET)
 endif
 
 # ---------- Optional icon (Windows only) ----------
@@ -38,13 +40,17 @@ ifeq ($(OS),Windows_NT)
   endif
 endif
 
-.PHONY: all clean
+.PHONY: all run clean
 
 all: $(TARGET)
 	@echo Compiled OK: $(TARGET)
 
 $(TARGET): $(SRC) $(EXTRA)
 	$(CC) $(SRC) $(EXTRA) -o $@ $(CFLAGS)
+
+# Compile and instantly launch SimpleBot (platform-safe execution)
+run: all
+	$(RUN_CMD)
 
 # Icon resource: generate the .rc, compile it to a COFF object, remove the .rc
 simplebot_res.o: simplebot.ico

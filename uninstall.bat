@@ -21,6 +21,5 @@ if exist "%DEST%" rd /s /q "%DEST%"
 
 echo.
 echo %APPNAME% has been uninstalled.
-echo Your dev folder (source and compiled exe) was not touched.
 echo.
 pause
