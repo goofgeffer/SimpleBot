@@ -2,10 +2,19 @@
 #include <ctype.h>
 #include <string.h>
 
-#define VERSION "v0.1"
-#define CLEAR_SCREEN() printf("\033[2J\033[H") // ANSI escape code to clear the screen
+#include "data.h"
 
-int print_learn_help(){
+// Dedicated lookup function for the chat interface, O(n) time complexity, but the list is small so it doesn't matter
+const char *lookup(const char *key, const KeyValuePair *pairs, size_t size) {
+	for (size_t i = 0; i < size; i++) {
+		if (strcmp(key, pairs[i].key) == 0) {
+			return pairs[i].value;
+		}
+	}
+	return NULL; // Return NULL if the key is not found
+}
+
+int print_learn_help() {
 	// Prints the options for the user to choose from
 	printf("Options:\n");
 	printf("Enter a for: ARITHMETIC\n");
@@ -39,7 +48,7 @@ int read_line(char *buffer, size_t size) {
 
 // Main function, self-explanatory
 int main(void) {
-	printf("SIMPLEBOT CHAT INTERFACE\n");
+	printf("SIMPLEBOT COMMAND INTERFACE\n");
 	// Buffer for command 
 	// What does buffer even mean its thrown around so much
 	char command[255];
@@ -72,50 +81,23 @@ int main(void) {
 			// Just prints the name of app, version, and a list of commands.
 		    printf("SimpleBot %s\n", VERSION);
 			printf("Commands:\n");
-		    printf("q/quit OR exit OR end, Ends the chat interface\n");
+		    printf("q/quit OR exit OR end, Ends the command interface\n");
 		    printf("h/help, Help about the commands\n");
 		    printf("v/version, Current version\n");
-		    printf("l/learn, Enters the learning engine interface, lets you choose from a list of subjects and you get a rough overview of each\n");
 			printf("c/clear, Clears the screen\n");
+		    printf("l/learn, Enters the learning engine interface, lets you choose from a list of subjects and you get a rough overview of each\n");
+			printf("ch/chat, Enters the chat interface, where you can ask questions and get answers\n");
 		} else if (strcmp(command, "v") == 0 || strcmp(command, "version") == 0) {
 		    printf("SimpleBot %s\n", VERSION);
-		} else if (strcmp(command, "l") == 0 || strcmp(command, "learn") == 0){
+		} else if (strcmp(command, "c") == 0 || strcmp(command, "clear") == 0) {
+			CLEAR_SCREEN();
+		} else if (strcmp(command, "l") == 0 || strcmp(command, "learn") == 0) {
 			printf("SIMPLEBOT LEARNING ENGINE\n");
 			printf("Quick overviews of topics, with examples\n");
 
 			print_learn_help();
 			
 			char line[255];
-
- 			// List of topics, mostly sourced from Wikipedia
-			const char *topics[] = {
-				"Arithmetic is a branch of mathematics that deals with operations like addition, subtraction, multiplication, and division. "
-				"Arithmetic is very important in day to day life. "
-				"Here are 2 examples: 9 + 9 = 18, 5 * 5 = 25\n",
-				
-				"Shapes are a representation of an object's external boundary or outline. "
-				"Simple shapes typically make up our life, such as a square TV or a rectangle. "
-				"A few examples of shapes would be a square (4 corners, 4 equal length sides), a triangle (3 corners, 3 sides), and a rectangle (4 corners, 2 pairs of equal length sides but the pairs "
-				"are different lengths)\n",
-
-				"PEMDAS is the order of operations used to solve math problems with more than one operation. "
-				"It stands for Parentheses, Exponents, Multiplication, Division, Addition, and Subtraction. "
-				"Multiplication and division share the same level and are done left to right, and so do addition and subtraction. "
-				"Here are 2 examples: 2 + 3 * 4 = 14 (multiply first), (2 + 3) * 4 = 20 (parentheses first)\n",
-
-				"The periodic table is a chart that organizes all known elements by their atomic number, which is how many protons are in that atom. "
-				"Elements in the same column have similar properties, and each element has a one or two letter symbol. "
-				"Some examples of elements on the table would be hydrogen (H, atomic number 1), carbon (C, atomic number 6), and oxygen (O, atomic number 8)\n",
-
-			    "The scientific method is a step by step process scientists use to investigate questions and test ideas. "
-				"The basic steps are: ask a question, do research, form a hypothesis, test it with an experiment, analyze the results, and share the conclusion. "
-				"For example, you could question if a sunflower grows faster with more light, do research about it, form a hypothesis, test it with different levels of light, and share the conclusion\n",
-				
-				"Atoms are building blocks that all matter is made of. "
-			    "An atom has a nucleus in the center made of protons (positive charge) and neutrons (no charge), with electrons (negative charge) moving around the outside. "
-			    "3 examples of atoms would be a hydrogen atom (1 proton, 1 electron), a helium atom (2 protons, 2 neutrons, 2 electrons), and a carbon atom (6 protons, 6 neutrons, 6 electrons)\n"
-			};
-
 			size_t limit = sizeof(topics) / sizeof(topics[0]) - 1; // Dynamic limit of topics, not hardcoded so I dont have to update this everytime a new topic comes by. Subtract by 1 so it's the index limit not number of topics
 			
 			for (;;) {
@@ -140,7 +122,7 @@ int main(void) {
 					break;	
 				}
 				
-				if (strcmp(line, "help") == 0){	
+				if (strcmp(line, "help") == 0) {	
 					print_learn_help();
 					continue;
 				}
@@ -149,7 +131,7 @@ int main(void) {
 
 				if (isalpha((unsigned char)chosen_character)) {
 					size_t index = tolower((unsigned char)chosen_character) - 'a';
-					if (index > limit){
+					if (index > limit) {
 						printf("Choose a letter from the list\n");
 						continue;
 					}
@@ -160,8 +142,52 @@ int main(void) {
 					continue;
 				}
 			}
-		} else if (strcmp(command, "c") == 0 || strcmp(command, "clear") == 0) {
-			CLEAR_SCREEN();
+		} else if (strcmp(command, "ch") == 0 || strcmp(command, "chat") == 0) {
+			char input[255];
+
+			const char *delimiters = " \t\n.!?,"; // Delimiters for tokenizing the input
+
+			printf("SIMPLEBOT CHAT INTERFACE\n");
+
+			for (;;) {
+				int chat_result = read_line(input, sizeof(input));
+				if (chat_result == 0) {
+					return 1;
+				}
+				if (chat_result == -1) {
+					printf("Input too long\n");
+					continue;
+				}
+
+				for (int i = 0; input[i]; i++) {
+					input[i] = tolower((unsigned char)input[i]); // Convert the input to lowercase for easier comparison
+				}
+
+				if (strcmp(input, "quit") == 0 || strcmp(input, "end") == 0 || strcmp(input, "exit") == 0) {
+					break;	
+				}
+
+				// Parse the input into words and look it up in a list of key-value structs.
+
+				// We are praying the user does not input a quotation mark, because strtok will break the input into two tokens and we will not be able to find the key in the list. 
+				// I could use regex to parse the input but that would be overkill for this project.
+				// Plus, theres no 2-word keys in the pair list (as of now) so it should be fine.
+				char *token = strtok(input, delimiters);
+				char answer_buffer[255] = ""; // Buffer to store the answer from the chatbot
+
+    			while (token != NULL) {
+					const char *value = lookup(token, chat_pairs, sizeof(chat_pairs) / sizeof(chat_pairs[0]));
+					if (value != NULL) {
+						strcat(answer_buffer, value);
+						strcat(answer_buffer, " "); // Add a space after each word
+					} else {
+						strcat(answer_buffer, "not sure "); // If the word is not found, add "not sure" to the answer
+					}
+					token = strtok(NULL, delimiters);
+    			}
+
+				printf("%s\n", answer_buffer);
+			}
 		} else {
 			printf("Unknown command. Type h for help.\n");
 		}
