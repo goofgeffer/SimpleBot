@@ -7,7 +7,7 @@ set "SRC=%~dp0simplebot.exe"
 set "DEST=%LocalAppData%\Programs\%APPNAME%"
 set "UKEY=HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\%APPNAME%"
 
-if not exist "%SRC%" echo ERROR: simplebot.exe not found next to install.bat. Run compile.bat first.& pause& exit /b 1
+if not exist "%SRC%" echo ERROR: simplebot.exe not found next to install.bat. Run make first.& pause& exit /b 1
 
 tasklist /FI "IMAGENAME eq simplebot.exe" 2>nul | find /I "simplebot.exe" >nul
 if not errorlevel 1 echo ERROR: SimpleBot is running. Close it and run this again.& pause& exit /b 1
