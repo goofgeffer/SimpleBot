@@ -14,6 +14,7 @@ const KeyValuePair chat_pairs[] = {
     {"hey", "hi"},
     {"greetings", "good day"},
     {"how", "so"},
+    {"and", ""},
     {"so", "go on"},
     {"are", "am"},
     {"do", "you"},
@@ -52,8 +53,6 @@ const KeyValuePair chat_pairs[] = {
     {"arithmetic", "branch of mathematics that deals with numbers and operations"},
     {"shapes", "representation of an object's external boundary or outline"},
     {"pemdas", "order of operations used to solve math problems with more than one operation"},
-    {"periodic table", "chart that organizes all known elements by their atomic number"},
-    {"scientific method", "step by step process scientists use to investigate questions and test ideas"},
     {"atoms", "building blocks that all matter is made of"},
     {"math", "numbers, addition, subtraction, multiplication, division"},
     {"science", "study of the natural world"},
@@ -71,6 +70,7 @@ const char *vocab_list =
     "hey\n"
     "greetings\n"
     "how\n"
+    "and"
     "so\n"
     "are\n"
     "do\n"
@@ -109,8 +109,6 @@ const char *vocab_list =
     "arithmetic\n"
     "shapes\n"
     "pemdas\n"
-    "periodic table\n"
-    "scientific method\n"
     "atoms\n"
     "math\n"
     "science\n"
@@ -125,6 +123,7 @@ const char *vocab_list =
 int run_chat_engine(void){
 	clear_screen();
 	char input[255];
+    char input_copy[255]; // Copy of the input to preserve the original input for punctuation checking
 
 	const char *delimiters = " \t\n.!?,"; // Delimiters for tokenizing the input
 
@@ -141,6 +140,8 @@ int run_chat_engine(void){
 			printf("Input too long\n");
 			continue;
 		}
+
+		strcpy(input_copy, input); // Copy the input to the copy buffer
 
 		for (int i = 0; input[i]; i++) {
 			input[i] = tolower((unsigned char)input[i]); // Convert the input to lowercase for easier comparison
@@ -177,8 +178,21 @@ int run_chat_engine(void){
 			}
 
 			strcat(answer_buffer, peice); // Append the answer to the buffer
-			strcat(answer_buffer, " "); // Add a space between words
 
+            // Note: Only works if before the peice is added to the answer buffer, or the period is before the peice.
+            char *match = strstr(input_copy, token); // Find the token in the original input copy
+            if (match != NULL) {
+                // Get the character right after the token in the original input copy
+                char *next_char = match + strlen(token);
+
+                // Check if the next character is a punctuation mark
+                if (is_target_punct(*next_char)) {
+                    strcat(answer_buffer, "."); // Append a period to the answer buffer if the next character is a punctuation mark
+                }
+            }
+
+            strcat(answer_buffer, " "); // Append a space to the answer buffer
+            
 			token = strtok(NULL, delimiters);
 		}
 

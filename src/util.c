@@ -24,6 +24,10 @@ int is_empty_or_whitespace(const char *string) {
 	return 1; // Empty or whitespace
 }
 
+int is_target_punct(int c) {
+    return c == '!' || c == ',' || c == '.' || c == '?';
+}
+
 // Reads a line into buffer. Returns 1 on success, 0 on failure and -1 if line was too long, so different from main-style int return
 int read_line(char *buffer, size_t size) {
 	if (fgets(buffer, size, stdin) == NULL) {
