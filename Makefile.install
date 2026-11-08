@@ -1,0 +1,105 @@
+# Cross-Platform Installation Makefile for SimpleBot (Windows & Linux)
+# Usage (Linux):   make -f Makefile.install install
+# Usage (Windows): mingw32-make -f Makefile.install install (or make -f Makefile.install install)
+
+# ---------- Platform Detection & Variables ----------
+ifeq ($(OS),Windows_NT)
+    # Windows Settings (using forward slashes to avoid GNU Make escape issues)
+    BINARY       = simplebot.exe
+    INSTALL_DIR  = $(LOCALAPPDATA)/Programs/SimpleBot
+    SHELL        = cmd.exe
+    .SHELLFLAGS  = /c
+else
+    # Linux Settings
+    BINARY       = simplebot
+    ICON         = assets/simplebot.png
+    DESKTOP      = simplebot.desktop
+    DEST_BIN     = ~/.local/bin
+    DEST_APPS    = ~/.local/share/applications
+    DEST_ICON    = ~/.local/share/icons/hicolor/256x256/apps
+endif
+
+.PHONY: install uninstall
+
+# ---------- Unified Install Target ----------
+install:
+	@echo "Checking for compiled binary ($(BINARY))..."
+ifeq ($(OS),Windows_NT)
+	@if not exist "$(BINARY)" ( \
+		echo Error: '$(BINARY)' not found. Please compile first! & \
+		exit /b 1 \
+	)
+	@echo [Windows] Installing SimpleBot to LocalAppData...
+	@if not exist "$(INSTALL_DIR)" mkdir "$(INSTALL_DIR)"
+	copy /y "$(BINARY)" "$(INSTALL_DIR)\"
+	
+	@echo [Windows] Creating Desktop Shortcut...
+	powershell -Command "$$desk = [Environment]::GetFolderPath('Desktop'); $$ws = New-Object -ComObject WScript.Shell; $$s = $$ws.CreateShortcut(\"$$desk\SimpleBot.lnk\"); $$s.TargetPath = '$(INSTALL_DIR)/$(BINARY)'; $$s.WorkingDirectory = '$(INSTALL_DIR)'; $$s.IconLocation = '$(INSTALL_DIR)/$(BINARY),0'; $$s.Save()"
+	
+	@echo [Windows] Registering in Apps and Features...
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\SimpleBot" /v "DisplayName" /t REG_SZ /d "SimpleBot" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\SimpleBot" /v "Publisher" /t REG_SZ /d "SimpleBot Developer" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\SimpleBot" /v "DisplayVersion" /t REG_SZ /d "1.0" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\SimpleBot" /v "InstallLocation" /t REG_SZ /d "$(INSTALL_DIR)" /f
+	reg add "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\SimpleBot" /v "UninstallString" /t REG_SZ /d "cmd.exe /c rmdir /s /q \"$(INSTALL_DIR)\" & reg delete \"HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\SimpleBot\" /f & del /q \"%%USERPROFILE%%\Desktop\SimpleBot.lnk\"" /f
+	
+	@echo Installation complete! SimpleBot is now on your Desktop and in Apps & Features.
+else
+	@if [ ! -f "$(BINARY)" ]; then \
+		echo "Error: '$(BINARY)' binary not found. Please compile first!"; \
+		exit 1; \
+	fi
+	@echo "[Linux] Installing SimpleBot for Linux..."
+	mkdir -p $(DEST_BIN)
+	mkdir -p $(DEST_APPS)
+	mkdir -p $(DEST_ICON)
+	
+	# Copy binary and set permissions
+	cp $(BINARY) $(DEST_BIN)/simplebot
+	chmod +x $(DEST_BIN)/simplebot
+	
+	# Copy 256x256 icon
+	@if [ -f "$(ICON)" ]; then \
+		cp $(ICON) $(DEST_ICON)/simplebot.png; \
+		echo "Icon copied to $(DEST_ICON)/simplebot.png"; \
+	else \
+		echo "Warning: $(ICON) not found, skipping icon installation."; \
+	fi
+	
+	# Generate .desktop shortcut file dynamically
+	cat << 'EOF' > $(DEST_APPS)/$(DESKTOP)
+[Desktop Entry]
+Name=SimpleBot
+Comment=A cross-platform C command-line chatbot
+Exec=simplebot
+Icon=simplebot
+Type=Application
+Terminal=true
+Categories=Utility;ConsoleOnly;
+EOF
+	@echo "Updating desktop database..."
+	-update-desktop-database $(DEST_APPS) 2>/dev/null || true
+	@echo "Installation complete! SimpleBot is now available in your app menu."
+endif
+
+# ---------- Unified Uninstall Target ----------
+uninstall:
+	@echo "Uninstalling SimpleBot..."
+ifeq ($(OS),Windows_NT)
+	@if exist "$(INSTALL_DIR)" ( \
+		rmdir /s /q "$(INSTALL_DIR)" & \
+		echo Removed installation directory. \
+	)
+	@if exist "%USERPROFILE%\Desktop\SimpleBot.lnk" ( \
+		del /q "%USERPROFILE%\Desktop\SimpleBot.lnk" & \
+		echo Removed Desktop shortcut. \
+	)
+	@reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Uninstall\SimpleBot" /f >nul 2>&1 || true
+	@echo Uninstallation complete from Windows.
+else
+	rm -f $(DEST_BIN)/simplebot
+	rm -f $(DEST_ICON)/simplebot.png
+	rm -f $(DEST_APPS)/$(DESKTOP)
+	-update-desktop-database $(DEST_APPS) 2>/dev/null || true
+	@echo "SimpleBot has been successfully uninstalled from your Linux environment."
+endif

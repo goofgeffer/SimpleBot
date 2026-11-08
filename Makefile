@@ -4,8 +4,8 @@
 #        make clean
 
 CC     = gcc
-CFLAGS = -Wall -Wextra -O2
-SRC    = main.c
+CFLAGS = -Wall -Wextra -O2 -Iinclude
+SRC    = $(wildcard src/*.c)
 
 # Force Windows cmd.exe if we are on Windows
 ifeq ($(OS),Windows_NT)
@@ -29,7 +29,7 @@ endif
 # ---------- Optional icon (Windows only) ----------
 EXTRA =
 ifeq ($(OS),Windows_NT)
-  ifneq ($(wildcard simplebot.ico),)
+  ifneq ($(wildcard assets/simplebot.ico),)
     ifneq ($(shell windres --version 2>$(NULL)),)
       EXTRA = simplebot_res.o
     else
@@ -53,8 +53,8 @@ run: all
 	$(RUN_CMD)
 
 # Icon resource: generate the .rc, compile it to a COFF object, remove the .rc
-simplebot_res.o: simplebot.ico
-	$(file >simplebot.rc,1 ICON "simplebot.ico")
+simplebot_res.o: assets/simplebot.ico
+	$(file >simplebot.rc,1 ICON "assets/simplebot.ico")
 	windres simplebot.rc -O coff -o $@
 	$(RM_F) simplebot.rc
 
