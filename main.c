@@ -2,7 +2,32 @@
 #include <ctype.h>
 #include <string.h>
 
-#include "data.h"
+#include "main.h"
+
+#ifdef _WIN32
+#include <windows.h>
+
+#ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+// On Windows, this constant is not defined in older versions of the Windows SDK, so we define it here for compatibility.
+#define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+#endif
+#endif
+
+// I hate Windows, this is historical baggage. Why doesn't cmd.exe just support ANSI escape codes like every other terminal in existence.
+void init_terminal(void) {
+#ifdef _WIN32
+	HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD mode;
+	if ((GetConsoleMode(hOut, &mode))) {
+		SetConsoleMode(hOut, mode |= ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	}
+#endif
+}
+
+void clear_screen(void) {
+	printf("\033[2J\033[H"); // ANSI escape code to clear the screen
+	fflush(stdout); // Ensure the output is flushed to the terminal
+}
 
 // Dedicated lookup function for the chat interface, O(n) time complexity, but the list is small so it doesn't matter
 const char *lookup(const char *key, const KeyValuePair *pairs, size_t size) {
@@ -48,7 +73,7 @@ int print_chat_help() {
 
 // Reads a line into buffer. Returns 1 on success, 0 on failure and -1 if line was too long, so different from main-style int return
 int read_line(char *buffer, size_t size) {
-    if (fgets(buffer, size, stdin) == NULL) {
+	if (fgets(buffer, size, stdin) == NULL) {
 		return 0;
     }
 
@@ -66,7 +91,10 @@ int read_line(char *buffer, size_t size) {
 
 // Main function, self-explanatory
 int main(void) {
-	CLEAR_SCREEN();
+	// Initizalize the terminal so you don't have to call it again
+	init_terminal();
+	clear_screen();
+
 	printf("SIMPLEBOT COMMAND INTERFACE\n");
 	// Buffer for command 
 	// What does buffer even mean its thrown around so much
@@ -93,7 +121,7 @@ int main(void) {
 		// Did not use a switch statement for the quit commands because i'd have to use break to end the for loop,
 		// which is used in switch statements to prevent fall-through
 		if (strcmp(command, "q") == 0 || strcmp(command, "quit") == 0 || strcmp(command, "exit") == 0 || strcmp(command, "end") == 0) {
-			CLEAR_SCREEN();
+			clear_screen();
 			break;
 		}
 		
@@ -110,9 +138,9 @@ int main(void) {
 		} else if (strcmp(command, "v") == 0 || strcmp(command, "version") == 0) {
 		    printf("SimpleBot %s\n", VERSION);
 		} else if (strcmp(command, "c") == 0 || strcmp(command, "clear") == 0) {
-			CLEAR_SCREEN();
+			clear_screen();
 		} else if (strcmp(command, "l") == 0 || strcmp(command, "learn") == 0) {
-			CLEAR_SCREEN();
+			clear_screen();
 			printf("SIMPLEBOT LEARNING ENGINE\n");
 			printf("Quick overviews of topics, with examples\n");
 
@@ -140,7 +168,7 @@ int main(void) {
 
 				// These if statements only work because we test for them before falling through to the letter logic, so always put these like word checks above the letter logic
 				if (strcmp(line, "quit") == 0 || strcmp(line, "end") == 0 || strcmp(line, "exit") == 0) {
-					CLEAR_SCREEN();
+					clear_screen();
 					break;	
 				}
 				
@@ -168,7 +196,7 @@ int main(void) {
 				}
 			}
 		} else if (strcmp(command, "ch") == 0 || strcmp(command, "chat") == 0) {
-			CLEAR_SCREEN();
+			clear_screen();
 			char input[255];
 
 			const char *delimiters = " \t\n.!?,"; // Delimiters for tokenizing the input
@@ -192,7 +220,7 @@ int main(void) {
 				}
 
 				if (strcmp(input, "quit") == 0 || strcmp(input, "end") == 0 || strcmp(input, "exit") == 0) {
-					CLEAR_SCREEN();
+					clear_screen();
 					break;	
 				}
 
@@ -217,12 +245,15 @@ int main(void) {
 
     			while (token != NULL) {
 					const char *value = lookup(token, chat_pairs, sizeof(chat_pairs) / sizeof(chat_pairs[0]));
-					if (value != NULL) {
-						strcat(answer_buffer, value);
-						strcat(answer_buffer, " "); // Add a space after each word
-					} else {
-						strcat(answer_buffer, "not sure "); // If the word is not found, add "not sure" to the answer
+					const char *peice = value ? value : "not sure"; // If the word is not found, use "not sure" as the answer
+
+					if (strlen(answer_buffer) + strlen(peice) + 2 > sizeof(answer_buffer)) { // Check if the answer buffer will overflow. + 2 is the trailing space and terminator
+						break; // Answer is full so we stop here. We could also truncate the answer but that would be messy
 					}
+
+					strcat(answer_buffer, peice); // Append the answer to the buffer
+					strcat(answer_buffer, " "); // Add a space between words
+
 					token = strtok(NULL, delimiters);
     			}
 

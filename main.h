@@ -8,6 +8,10 @@
 #define MAX_TOKENS 255
 #define MAX_LENGTH 255
 
+// Boring functions since Windows has legacy baggage
+void init_terminal(void);
+void clear_screen(void);
+
 // Key-value pair struct for the chat interface
 typedef struct {
 	const char *key;
